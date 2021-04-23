@@ -1,0 +1,29 @@
+get_html_head <- function() {
+  tags$head(
+  tags$link(rel="stylesheet", 
+            href="https://cdn.jsdelivr.net/npm/katex@0.10.1/dist/katex.min.css", 
+            integrity="sha384-dbVIfZGuN1Yq7/1Ocstc1lUEm+AT+/rCkibIcC/OmWo5f0EA48Vf8CytHzGrSwbQ",
+            crossorigin="anonymous"),
+  tags$style(HTML("
+                                      div.MathJax_Display{
+                                      text-align: left !important;
+                                      }
+                                      ")),
+  HTML('<script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.1/dist/katex.min.js" integrity="sha384-2BKqo+exmr9su6dir+qCw08N2ZKRucY4PrGQPPWU1A7FtlCGjmEGFqXCv5nyM5Ij" crossorigin="anonymous"></script>'),
+  HTML('<script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"></script>'),
+  HTML('
+                           <script>
+                           document.addEventListener("DOMContentLoaded", function(){
+                           renderMathInElement(document.body, {
+                           delimiters: [{left: "$", right: "$", display: false}]
+                           });
+                           })
+                           </script>') 
+  )
+}
+
+get_short_description <- function(){
+  p("This is the shiny app that visualizes realisations of the VIP-SIRS model presented in the paper", br(),
+  strong("The VIP-SIRS model predicts dangerous COVID-19 dynamics after immunity passport introduction 
+       and suggests policy making solutions"), " by ", em("[authors-list]"))
+}
