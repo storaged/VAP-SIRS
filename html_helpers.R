@@ -23,7 +23,10 @@ get_html_head <- function() {
 }
 
 get_short_description <- function(){
-  p("This is the shiny app that visualizes realisations of the VIP-SIRS model presented in the paper", br(),
-  strong("The VIP-SIRS model predicts dangerous COVID-19 dynamics after immunity passport introduction 
-       and suggests policy making solutions"), " by ", em("[authors-list]"))
+  p("VAP-SIRS is a model presented in the paper", 
+  strong("Unfavourable impact of COVID-19 vaccination passes on epidemic dynamics"), " by ",
+  em("Tyll Krueger, Krzysztof Gogolewski, Marcin Bodych, 
+  Anna Gambin, Giulia Giordano, Sarah Cuschieri , Thomas Czypionka,  Matjaz Perc, Elena Petelos,
+  Magdalena Rosińska and Ewa Szczurek"), " and aims to predict different epidemic dynamics 
+  in case of introduction of so-called ", em("Vaccination Passes (VP)", "."))
 }
