@@ -1,5 +1,2 @@
-# VIP-SIRS
-A model for prediction of COVID-19 dynamics after immunity passport introduction
-
-PRE-PRINT: 
-ON-LINE Shiny app: 
+# VAP-SIRS
+A SEIR-based model for prediction of COVID-19 spread dynamics after vaccination passport implementation
