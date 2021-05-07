@@ -996,56 +996,6 @@ server <- function(input, output, session) {
   
   }
 
-#EXTENDED V-SIR MODEL
-ext.closed.sir.model <- function (t, x, params) {
-  ## first extract the state variables
-  N   <- sum(x[1:10])
-  S   <- x['S']/N
-  Sv  <- x['Sv']/N
-  Sd  <- x['Sd']/N
-  V   <- x['V']/N
-  I   <- x['I']/N
-  Iv  <- x['Iv']/N
-  Id  <- x['Id']/N
-  R   <- x['R']/N
-  Rv  <- x['Rv']/N
-  Rd  <- x['Rd']/N
-  
-  ## now extract the parameters
-  beta11 <- params["beta11"]; beta12 <- params["beta12"]; beta13 <- params["beta13"]; 
-  beta21 <- params["beta21"]; beta22 <- params["beta22"]; beta23 <- params["beta23"]; 
-  beta31 <- params["beta31"]; beta32 <- params["beta32"]; beta33 <- params["beta33"]; 
-  gamma_1 <- params["gamma_1"]; gamma_2 <- params["gamma_2"];
-  nu_1 <- params["nu_1"]; nu_2 <- params["nu_2"]
-  kappa <- params["kappa"]
-  alpha <- params["alpha"]
-  
-  ## now code the model equations
-  dSdt  <-  - beta11 * S  * I - beta12 * S  * Iv - beta13 * S  * Id - nu_1 * S + kappa * R
-  dSvdt <-  - beta21 * Sv * I - beta22 * Sv * Iv - beta23 * Sv * Id + ## all to Infected after vaccination (Iv)
-    nu_2 * V + ## lost immunity after vaccination
-    nu_1 * (1-alpha) * S - ## immunity not gained after first vaccination
-    nu_1 * Sv + ## re-vaccination
-    nu_1 * (1-alpha) * Sv ## simmunity not gained after re-vaccination
-  dSddt <-  - beta31 * Sd * I - beta32 * Sd * Iv - beta33 * Sd * Id + kappa * Rd
-  
-  dVdt  <-  nu_1 * alpha * S - ## immune after first vaccination
-    nu_2 * V + ## lost immunity 
-    nu_1 * alpha * Sv ## immune after re-vaccination
-  
-  dIdt  <- (beta11 * I + beta12 * Iv + beta13 * Id) * S  - gamma_1 * I
-  dIvdt <- (beta21 * I + beta22 * Iv + beta23 * Id) * Sv - gamma_1 * Iv
-  dIddt <- (beta31 * I + beta32 * Iv + beta33 * Id) * Sd - gamma_1 * Id
-  
-  dRdt  <- gamma_1 * I   - kappa * R
-  dRvdt <- gamma_1 * Iv  - kappa * Rv
-  dRddt <- gamma_1 * Id  - kappa * Rd
-  ## combine results into a single vector
-  dxdt <- c(dSdt,dSvdt,dSddt,dVdt,dIdt,dIvdt,dIddt,dRdt,dRvdt,dRddt)
-  ## return result as a list!
-  list(dxdt)
-}
-
 ext.closed.sir.model.v2 <- function (t, x, params) {
   ## first extract the state variables
   N   <- sum(x[1:12])
