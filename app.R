@@ -32,11 +32,8 @@ plan(multisession)
 # Define UI for application that draws a histogram
 
 ui <- dashboardBody(
-  
-         #tabsetPanel(id = "panels", type = "tabs",
-      tabBox(width = 12, id = "panels",
+  tabBox(width = 12, id = "panels",
          tabPanel(value = "VAP-SIRS-app", title = "VAP-SIRS",
-                  #fluidPage(
                     fluidPage(
                       get_html_head() , 
                       shinyjs::useShinyjs(),
@@ -50,47 +47,8 @@ ui <- dashboardBody(
                                   with additional states and parameters that describe the dynamics 
                                   of vaccination routine in a population (green arrows)."))
                       ),
-                      fluidRow(
-                      
-                        #column(4,
-                        #       mainPanel(h4("Vaccination:")),
-                        #       checkboxInput("fast_vacc", "fast (100% in 200 days)", value = F),
-                        #       checkboxInput("variant", "Fast loss of immunity (~200 days)", value = F)),
-                        #column(4,
-                        #       mainPanel(h4("Only two betas:")),
-                        #       checkboxInput("two_betas", withMathJax("Use only $\\beta_{S_V,I_V}^{I_V}$ others are equal") , value = T),
-                        #       checkboxInput("two_betas", withMathJax("Use only $\\beta$ and $\\beta_V$") , value = T),
-              
-                        #       checkboxInput("fix_gamma", withMathJax("Fix: $\\gamma = \\frac{1}{6}$") , value = T),
-                        #       checkboxInput("fix_reduction", withMathJax("Fix: $r = 0.8$") , value = F),
-                        #       checkboxInput("fix_nu1star", withMathJax("Fix: $\\upsilon = \\upsilon_r$") , value = T)) 
-                       
-                               
-                        #column(4,
-                               #mainPanel(h4("Contacts:")),
-                               #checkboxInput("check1", "Use means", value = F),
-                               #checkboxInput("go_crazy", withMathJax("Go crazy: $\\beta_{S_V,I_V}^{I_V} = 4 \\cdot \\beta_{S,I}^{I}$"), value = F))
-                        ),
-                    
-                      #fluidRow(
-                      #  mainPanel(h4("Selected parameters' values: "))
-                      #  ),
-                      #uiOutput("current_parameters"),
-                      fluidRow( 
-                        #column(4,
-                        #       checkboxInput("log_scale", "Use log-scale on Y axis", value = F), 
-                        #       checkboxInput("displayTable", "Display table values", value = F),
-                        #       sliderInput("lookup", withMathJax("$t_i$"),  min = 0,  max = 2*365, value = 400, step=1 )),
-                        
-                               #checkboxInput("proportional_mixing", "Use proportional mixing", value = F)),
-                        #column(4,
-                        #       selectInput("plot_type", "Select plot type:",
-                        #                   c("Daily incidence" = "daily"#,
-                        #                     #"Infections per 1M" = "per1M"
-                        #                     )))
-                      ),
-                      
-                      
+                      fluidRow( ),
+                      fluidRow( ),
                       sidebarLayout(
                         sidebarPanel(
                           fluidRow(
@@ -101,14 +59,18 @@ ui <- dashboardBody(
                           ),
                           fluidRow(
                             column(4,
-                                   checkboxInput("two_betas", withMathJax("VAP-SIRS setting") , value = T),
-                                   checkboxInput("fix_nu1star", withMathJax("Fix: $\\upsilon = \\upsilon_r$") , value = T)),
+                                   checkboxInput("two_betas", withMathJax("VAP-SIRS setting") , 
+                                                 value = T),
+                                   checkboxInput("fix_nu1star", withMathJax("Fix: $\\upsilon = \\upsilon_r$") , 
+                                                 value = T)),
                             column(4,
-                                   checkboxInput("log_scale", "log-scale Y axis", value = F),
-                                   checkboxInput("displayTable", "Display I-values", value = F)),
+                                   checkboxInput("log_scale", "log-scale Y axis", 
+                                                 value = F),
+                                   checkboxInput("displayTable", "Display I-values", 
+                                                 value = F)),
                             column(4,
-                                   checkboxInput("common_y_axis", "Common Y-axis", value = F))
-                            
+                                   checkboxInput("common_y_axis", "Common Y-axis", 
+                                                 value = F))
                           ),
                           fluidRow(
                             column(12,
@@ -117,40 +79,42 @@ ui <- dashboardBody(
                           ),
                           fluidRow(
                             column(8,
-                                   h5("Initial population sizes"))
+                                   h5("Initial population sizes")
+                                   )
                           ),      
                           fluidRow(
                             column(4,
-                                   sliderInput("S", withMathJax("$S$usceptible"), min = 0,  max = 100000, value = S_INIT, step=1000),
-                                   sliderInput("R", withMathJax("$R$ecovered"),  min = 0,  max = 100000, value = R_INIT, step=100 )
-                            
+                                   sliderInput("S", withMathJax("$S$usceptible"), min = 0,  max = 100000, 
+                                               value = S_INIT, step=1000),
+                                   sliderInput("R", withMathJax("$R$ecovered"),  min = 0,  max = 100000, 
+                                               value = R_INIT, step=100 )
                                    ),
                             column(4, 
                                    sliderInput("I", withMathJax("$I$nfected"),   min = 0, max = 20000,  value = I_INIT, step=10),
                                    sliderInput("V", withMathJax("$V$accinated"),  min = 0,  max = 100000, value = V_INIT , step=100 )
-                          
                                    ),
                             column(4, 
                                    style = "background-color: #f0f0f0; border-radius: 5px; padding-left: 15px; border: 1px solid #dfdfdf;",
-                                   
-                                   uiOutput("Initial_conditions"))
-                          ),
-                         
+                                   uiOutput("Initial_conditions")
+                                   )
+                            ),
                           fluidRow(
                             column(12,
-                                   h5("Infection parameters setup"))
-                          ), fluidRow(
-                            column(4, #sliderInput("infectivity",withMathJax("$\\beta_0$") , 
-                                      #            min = 0, max = round(BETA_MAX, 3), value = BETA_0, step = 0.001), 
-                                    sliderInput("R0",withMathJax("$R_0$") , 
+                                   h5("Infection parameters setup")
+                                   )
+                            ), 
+                          fluidRow(
+                            column(4,
+                                   sliderInput("R0",withMathJax("$R_0$") , 
                                        min = 0, max = 6, value = R_MAX, step = 0.1), 
-                                               
                                     sliderInput("gamma", withMathJax("$\\gamma$"),  
-                                        min = 0,max = 1,value = GAMMA, step = 0.001)),
+                                        min = 0,max = 1,value = GAMMA, step = 0.001)
+                                   ),
                             column(4,  sliderInput("freedom",withMathJax("$f$") , 
                                                    min = 0,max = 1,value = F_GENERAL, step = 0.01), 
                                        sliderInput("freedom_V",withMathJax("$f_V$") , 
-                                               min = 0,max = 1,value = F_V, step = 0.01)),
+                                               min = 0,max = 1,value = F_V, step = 0.01)
+                                   ),
                             column(4, 
                                    style = "background-color: #f0f0f0; border-radius: 5px; padding-left: 15px; border: 1px solid #dfdfdf;",
                                    h6("Transmissability:"),
@@ -158,38 +122,41 @@ ui <- dashboardBody(
                                    h6("Contact rates:"),
                                    uiOutput("beta_val"),
                                    uiOutput("beta_V_val"))
-                                   #sliderInput("beta11",withMathJax("$\\beta$"),
-                                   #                min = 0,max = 1,value = BETA, step = 0.001), 
-                                  #    sliderInput("beta22",withMathJax("$\\beta_V$"), 
-                                   #            min = 0,max = 1,value = BETA, step = 0.001))
                           ), 
+                          fluidRow( ), 
                           fluidRow(
-                          ), fluidRow(
                             column(12,
-                                   h5("Vaccination parameters setup"))
-                          ), fluidRow(
+                                   h5("Vaccination parameters setup")
+                                   )
+                            ), 
+                          fluidRow(
                             column(4, sliderInput("nu1",withMathJax("$\\upsilon$"), 
-                                                  min = 0,max = 0.05, value = 1/UPSILON, step = 0.0005)),
+                                                  min = 0,max = 0.05, value = 1/UPSILON, step = 0.0005)
+                                   ),
                             column(4, sliderInput("nu2",withMathJax("$\\omega$"), 
-                                                  min = 0,max = 0.05,value = 1/OMEGA, step = 0.0005)),
+                                                  min = 0,max = 0.05,value = 1/OMEGA, step = 0.0005)
+                                   ),
                             column(4, sliderInput("kappa", withMathJax("$\\kappa$"), 
-                                                  min = 0,max = 0.05,value = 1/KAPPA, step = 0.0005))
-                          ), 
+                                                  min = 0,max = 0.05,value = 1/KAPPA, step = 0.0005)
+                                   )
+                            ), 
                           fluidRow(
                             column(4, sliderInput("nu1star",withMathJax("$\\upsilon_r$"), 
-                                                  min = 0, max = 0.05, value = 1/UPSILON_R, step = 0.0005)),
+                                                  min = 0, max = 0.05, value = 1/UPSILON_R, step = 0.0005)
+                                   ),
                             column(4, sliderInput("sceptics", withMathJax("$d$"),  
-                                                  min = 0,max = 1,value = D_FRACTION, step = 0.01)),
+                                                  min = 0,max = 1,value = D_FRACTION, step = 0.01)
+                                   ),
                             column(4, sliderInput("alpha1", withMathJax("$a$"), 
-                                                  min = 0,max = 1,value = A_1, step = 0.01))
-                            #sliderInput("gamma", withMathJax("$\\gamma$"),  min = 0,max = 1,value = GAMMA, step = 0.001),
-                            
-                          )
+                                                  min = 0,max = 1,value = A_1, step = 0.01)
+                                   )
+                            )
                           ),
                         mainPanel(
-                          fluidRow( style = "background-color: #f4f4f4; border-radius: 5px; padding-left: 15px; border: 1px solid #dfdfdf;",
+                          fluidRow( 
+                            style = "background-color: #f4f4f4; border-radius: 5px; padding-left: 
+                                     15px; border: 1px solid #dfdfdf;",
                             h5("    Representative signature settings: "),
-                          
                             column(2,
                                    checkboxInput("signatureI", HTML("Sig. I: [&#8722;, &#43;]"), value = F)),
                             column(2,
@@ -203,28 +170,22 @@ ui <- dashboardBody(
                             fluidRow(
                               column(4,
                                      sliderInput("sim_tmax", withMathJax("$t_{max}$ - simulation time"),  
-                                                 min = 1,  max = 4*365, value = T_MAX_INIT, step=1 )),
+                                                 min = 1,  max = 4*365, value = T_MAX_INIT, step=1 )
+                                     ),
                               column(4,
                                      selectInput("plot_type", "Select plot type:",
                                                  c("Daily incidence" = "daily",
                                                    "Infections per 1M" = "per1M"
-                                                 ))),
+                                                 ))
+                                     ),
                               column(4, 
                                      h5("Download"),
                                      downloadButton("downloadPlot", "plot"),
-                                     downloadButton("downloadData", ".csv data"))
-                              
-                              
+                                     downloadButton("downloadData", ".csv data")
+                                     )
+                              ),
                             ),
-                            
-                          ),
-                          #hr(),
-                          #fluidRow(
-                          #  column(6,
-                          #         h5("Plotting Settings"))
-                          #),
-                          fluidRow(
-                          ),
+                          fluidRow( ),
                           fluidRow(
                             column(6,
                                    h4("Proportional Mixing")),
@@ -234,108 +195,74 @@ ui <- dashboardBody(
                           fluidRow(
                             plotOutput("extDistPlotv2", height = "600px")
                           ),
-                          fluidRow(
-                           
-                          )
+                          fluidRow( )
                         ) # mainPanel
                       ), #SidebarLayout
-                        
-                     
-                       
-                      fluidRow(
-                      #  column(6,
-                      #         h4("Parameter setup"))
-                      ),       
                       
+                      fluidRow( ),   
                       fluidRow(id = "old_params",
                                fluidRow(
-                                 #   column(2,
-                                 #          sliderInput("S", withMathJax("$S = (1-d) \\cdot S_N + d \\cdot S_D$"), min = 0,  max = 100000, value = S_INIT, step=1000)),
                                  column(2,
-                                        sliderInput("Sv1", withMathJax("$S_1$"), min = 0,  max = 100000, value = 0, step=1000)),
-                                 #   column(2,
-                                 #          sliderInput("I", withMathJax("$I = (1-d) \\cdot I_N + d \\cdot I_D$"),   min = 0, max = 20000,  value = I_INIT, step=1)),
-                                 #   column(2,
-                                 #          sliderInput("R", withMathJax("$R = (1-d ) \\cdot R_N + d \\cdot R_D$"),  min = 0,  max = 100000, value = R_INIT, step=100 )),
-                                 #   column(2,
-                                 #          sliderInput("V", withMathJax("$V$"),  min = 0,  max = 100000, value = V_INIT , step=100 ))
-                               ),
-                        column(2,
-                               sliderInput("infectivity",withMathJax("$\\beta_0$") , min = 0,max = 1,value = BETA_0, step = 0.001),
-                               sliderInput("beta11",label = withMathJax("$\\beta_{S_N,I_N}^{I_N}$"), min = 0,max = 1,value = BETA, step = 0.001),
-                        #       sliderInput("beta11",withMathJax("$\\beta$"), min = 0,max = 1,value = BETA, step = 0.001),
-                               sliderInput("beta12",withMathJax("$\\beta_{S_N,I_N}^{I_V}$") , min = 0,max = 1,value = BETA, step = 0.001),
-                               sliderInput("beta13",withMathJax("$\\beta_{S_N,I_N}^{I_D}$") , min = 0,max = 1,value = BETA, step = 0.001)
-                               
-                               ),
-                        column(2,
-                               #sliderInput("freedom",withMathJax("$f$") , min = 0,max = 1,value = F_GENERAL, step = 0.01),
-                               sliderInput("beta21",withMathJax("$\\beta_{S_V,I_V}^{I_N}$"), min = 0,max = 1,value = BETA, step = 0.001),
-                               #sliderInput("beta22",withMathJax("$\\beta_V$"), min = 0,max = 1,value = BETA, step = 0.001),
-                               sliderInput("beta22",withMathJax("$\\beta_{S_V,I_V}^{I_V}$"), min = 0,max = 1,value = BETA_V, step = 0.001),
-                               sliderInput("beta23",withMathJax("$\\beta_{S_V,I_V}^{I_D}$"), min = 0,max = 1,value = BETA, step = 0.001)
-                               
-                               ),
-                        column(2,
-                               #sliderInput("freedom_V",withMathJax("$f_V$") , min = 0,max = 1,value = F_V, step = 0.01),
-                              
-                               sliderInput("beta31",withMathJax("$\\beta_{S_D,I_D}^{I_N}$"), min = 0,max = 1,value = BETA, step = 0.001),
-                               sliderInput("beta32",withMathJax("$\\beta_{S_D,I_D}^{I_V}$"), min = 0,max = 1,value = BETA, step = 0.001),
-                               sliderInput("beta33",withMathJax("$\\beta_{S_D,I_D}^{I_D}$"), min = 0,max = 1,value = BETA, step = 0.001)
-                               
-                               ),
-                        column(2,
-                               #sliderInput("reduction",withMathJax("$r$") , min = 0,max = 1,value = 1, step = 0.001), 
-                               #sliderInput("nu1",withMathJax("$\\upsilon$"), min = 0,max = 0.05, value = 1/UPSILON, step = 0.0005),
-                               #sliderInput("nu1star",withMathJax("$\\upsilon_r$"), min = 0, max = 0.05, value = 1/UPSILON_R, step = 0.0005),
-                               #sliderInput("nu2",withMathJax("$\\omega$"), min = 0,max = 0.05,value = 1/OMEGA, step = 0.0005),
-                               #sliderInput("kappa", withMathJax("$\\kappa$"),  min = 0,max = 0.05,value = 1/KAPPA, step = 0.0005)
-                               
-                               ),
-                        column(2,
-                               #sliderInput("sceptics", withMathJax("$d$"),  min = 0,max = 1,value = D_FRACTION, step = 0.01),
-                               #sliderInput("gamma", withMathJax("$\\gamma$"),  min = 0,max = 1,value = GAMMA, step = 0.001),
-                               #sliderInput("alpha1", withMathJax("$a$"),  min = 0,max = 1,value = A_1, step = 0.01),
-                               sliderInput("alpha2", withMathJax("$a_2$"),  min = 0,max = 1,value = A_2, step = 0.01)
+                                        sliderInput("Sv1", withMathJax("$S_1$"), min = 0,  max = 100000, 
+                                                    value = 0, step=1000)
+                                        ), 
+                                 ),
+                               column(2,
+                                      sliderInput("infectivity",withMathJax("$\\beta_0$") , min = 0,max = 1,
+                                                  value = BETA_0, step = 0.001),
+                                      sliderInput("beta11",label = withMathJax("$\\beta_{S_N,I_N}^{I_N}$"), min = 0,max = 1,
+                                                  value = BETA, step = 0.001),
+                                      sliderInput("beta12",withMathJax("$\\beta_{S_N,I_N}^{I_V}$") , min = 0,max = 1,
+                                                  value = BETA, step = 0.001),
+                                      sliderInput("beta13",withMathJax("$\\beta_{S_N,I_N}^{I_D}$") , min = 0,max = 1,
+                                                  value = BETA, step = 0.001)
+                                      ),
+                               column(2,
+                                      sliderInput("beta21",withMathJax("$\\beta_{S_V,I_V}^{I_N}$"), min = 0,max = 1,
+                                                  value = BETA, step = 0.001),
+                                      sliderInput("beta22",withMathJax("$\\beta_{S_V,I_V}^{I_V}$"), min = 0,max = 1,
+                                                  value = BETA_V, step = 0.001),
+                                      sliderInput("beta23",withMathJax("$\\beta_{S_V,I_V}^{I_D}$"), min = 0,max = 1,
+                                                  value = BETA, step = 0.001)
+                                      ),
+                               column(2,
+                                      sliderInput("beta31",withMathJax("$\\beta_{S_D,I_D}^{I_N}$"), min = 0,max = 1,
+                                                  value = BETA, step = 0.001),
+                                      sliderInput("beta32",withMathJax("$\\beta_{S_D,I_D}^{I_V}$"), min = 0,max = 1,
+                                                  value = BETA, step = 0.001),
+                                      sliderInput("beta33",withMathJax("$\\beta_{S_D,I_D}^{I_D}$"), min = 0,max = 1,
+                                                  value = BETA, step = 0.001)
+                                      ),
+                               column(2, ),
+                               column(2,
+                                      sliderInput("alpha2", withMathJax("$a_2$"),  min = 0,max = 1,
+                                                  value = A_2, step = 0.01)
+                                      )
                                )
-                        #column(2,
-                        #       sliderInput("S", withMathJax("$S = (1-d) \\cdot S_N + d \\cdot S_D$"), min = 0,  max = 100000, value = S_INIT, step=1000),
-                        #       sliderInput("Sv1", withMathJax("$S_1$"), min = 0,  max = 100000, value = 0, step=1000),
-                        #       sliderInput("I", withMathJax("$I = (1-d) \\cdot I_N + d \\cdot I_D$"),   min = 0, max = 20000,  value = I_INIT, step=1),
-                        #       sliderInput("R", withMathJax("$R = (1-d ) \\cdot R_N + d \\cdot R_D$"),  min = 0,  max = 100000, value = R_INIT, step=100 ),
-                        #       sliderInput("V", withMathJax("$V$"),  min = 0,  max = 100000, value = V_INIT , step=100 ),
-                               
-                          )
-                        )
-                      
-                    #)
+                      )
                   ),
-                  
-         tabPanel(value = "VAP-SIRS-formulation", title = "VAP-SIRS: formulation",
+         tabPanel(value = "VAP-SIRS-formulation", 
+                  title = "VAP-SIRS: formulation",
                   fluidPage(
-                    get_html_head()
-                    , shinyjs::useShinyjs(),
+                    get_html_head(), 
+                    shinyjs::useShinyjs(),
                     titlePanel("VIP-SIRS: Formulation of the model"),
-                    
                     fluidRow(
-                      mainPanel(h4("System of ODEs: "))
-                    ),
+                      mainPanel(h4("System of ODEs: ")) 
+                      ),
                     uiOutput("ode_model_description"),
-                    
                     fluidRow(
-                      mainPanel(h4("Parameters description: "))
-                    ),
+                      mainPanel(h4("Parameters description: ")
+                                )
+                      ),
                     uiOutput("description")
                     )
-         
-         ),
+                  ), #tabpanel
          hr(),
          h6("VAP-SIRS shiny app was developed in R and Rstudio by K.Gogolewski; Copyright", 
             HTML("&#169;"), "2021", align = "center")
          )
-     # )
-    )
-
+      )
 
 update_on_freedom <- function(input, output, session, beta0){
   updateSliderInput(session, "beta11", value =  (1 - input$freedom) * beta0 ) 
@@ -376,23 +303,12 @@ signatures_f <- lapply(1:5, function(i)
 
 names(signatures_f) <- paste("signature", as.roman(1:5), sep = "")
 
-
-
-
 # Define server logic required to draw a histogram
 server <- function(input, output, session) {
   
   observeEvent(input$link_to_tabpanel_a, {
     updateTabsetPanel(session, "panels", selected = "VAP-SIRS-formulation")
   })
-  
-  #output$beta11_slider <- renderUI({
-    #if(!input$two_betas){
-    #  sliderInput("beta11",label = withMathJax("$\\beta_{S_N,I_N}^{I_N}$"), min = 0,max = 1,value = BETA, step = 0.001)
-    #} else {
-    #  sliderInput("beta11",label = list(withMathJax(), "$\\beta$"), min = 0,max = 1,value = BETA, step = 0.001)
-    #}
-  #})
   
   observeEvent(input$signatureI,{ if (input$signatureI) signatures_f$signatureI(input, output, session) })
   observeEvent(input$signatureII,{ if (input$signatureII) signatures_f$signatureII(input, output, session) })
@@ -401,32 +317,7 @@ server <- function(input, output, session) {
   observeEvent(input$signatureV,{ if (input$signatureV) signatures_f$signatureV(input, output, session) })
   
   observeEvent(input$two_betas,{
-    #if(input$two_betas){
-    #  updateSliderInput(session, "beta11", label = withMathJax("$\\beta$"))
-    #  updateSliderInput(session, "beta22", label = paste(withMathJax("$\\beta_V$")))
-    #} else {
-    #  updateSliderInput(session, "beta11", label = withMathJax("$\\beta_{S_N,I_N}^{I_V}$"))
-    #  updateSliderInput(session, "beta22", label = withMathJax("$\\beta_{S_V,I_V}^{I_V}$"))    
-    #}
-    #shinyjs::toggle(id="beta12", ! input$two_betas) 
-    #shinyjs::toggle(id="beta13", ! input$two_betas) 
-    #shinyjs::toggle(id="beta21", ! input$two_betas) 
-    #shinyjs::toggle(id="beta23", ! input$two_betas) 
-    #shinyjs::toggle(id="beta31", ! input$two_betas) 
-    #shinyjs::toggle(id="beta32", ! input$two_betas) 
-    #shinyjs::toggle(id="beta33", ! input$two_betas) 
-    #shinyjs::toggle(id="alpha2", ! input$two_betas) 
-    #shinyjs::toggle(id="Sv1", ! input$two_betas) 
     shinyjs::toggle(id="old_params", ! input$two_betas) 
-    #toggleState(id="beta12") 
-    #toggleState(id="beta13")
-    #toggleState(id="beta21")
-    #toggleState(id="beta23")
-    #toggleState(id="beta31")
-    #toggleState(id="beta32")
-    #toggleState(id="beta33")
-    #toggleState(id="alpha2")
-    #toggleState(id="Sv1")
     toggleState(id="old_params")
   })
 
@@ -435,34 +326,32 @@ server <- function(input, output, session) {
   
   
   observeEvent(input$nu1,{
-    #toggleState(id="nu1star")
     if (input$fix_nu1star) { 
       updateSliderInput(session, "nu1star", value = input$nu1 ) 
     } 
   })
   
-  observeEvent(input$freedom | input$freedom_V | input$R0 | input$gamma , { #} | input$reduction ,{
-    #print("OBSERVED CHANGE")
+  observeEvent(input$freedom | input$freedom_V | input$R0 | input$gamma , { 
     if (input$two_betas) { print("Describe BETAS");
       tmp_beta_0 <- input$R0 * input$gamma
       tmp_beta <- tmp_beta_0 * (1 - input$freedom)
       tmp_beta_V <- tmp_beta_0 * (1 - input$freedom_V) 
-      #tagList(
-      #  helpText(printf('Transmissability:\n$\\beta_0=%.04f$\n\nContact rates:\n\\beta=%.04f$\n\\beta_V=%.04f$', beta_0, beta, beta_V)),
-      #  tags$script('renderMathInElement(document.getElementById("Initial_conditions"), {delimiters: [{left: "$", right: "$", display: false}]});')
-      #)
-      #output$beta_0_val <- render.betas(input, output, session, tmp_beta_0, tmp_beta, tmp_beta_V)
+      
       output$beta_0_val <- renderUI({ 
         tagList( 
-          helpText(style="font-size:10px;margin-top:0px;margin-bottom:1px;", sprintf('$\\beta_0 = R_0 \\cdot \\gamma$')),
-          helpText(style="margin-top:0px;margin-bottom:2px;", sprintf('$\\beta_0$ = %.04f', tmp_beta_0)),
+          helpText(style="font-size:10px;margin-top:0px;margin-bottom:1px;", 
+                   sprintf('$\\beta_0 = R_0 \\cdot \\gamma$')),
+          helpText(style="margin-top:0px;margin-bottom:2px;", 
+                   sprintf('$\\beta_0$ = %.04f', tmp_beta_0)),
           tags$script('renderMathInElement(document.getElementById("beta_0_val"), {delimiters: [{left: "$", right: "$", display: false}]});')
         )
       })
       output$beta_val<- renderUI({ 
         tagList( 
-          helpText(style="font-size:10px;margin-top:0px;margin-bottom:1px;", sprintf('$\\beta = \\beta_0 \\cdot (1-f)$')),
-          helpText(style="margin-top:0px;margin-bottom:2px;", sprintf('$\\beta$ = %.04f', tmp_beta)),
+          helpText(style="font-size:10px;margin-top:0px;margin-bottom:1px;", 
+                   sprintf('$\\beta = \\beta_0 \\cdot (1-f)$')),
+          helpText(style="margin-top:0px;margin-bottom:2px;", 
+                   sprintf('$\\beta$ = %.04f', tmp_beta)),
           tags$script('renderMathInElement(document.getElementById("beta_val"), {delimiters: [{left: "$", right: "$", display: false}]});')
         )
       })
@@ -473,8 +362,6 @@ server <- function(input, output, session) {
           tags$script('renderMathInElement(document.getElementById("beta_V_val"), {delimiters: [{left: "$", right: "$", display: false}]});')
         )
       })
-      #output$beta_val <- renderUI({ withMathJax( sprintf('$$\\beta = %.04f$$', tmp_beta_0 * (1 - input$freedom) )) })
-      #output$beta_V_val <- renderUI({ withMathJax( sprintf('$$\\beta_V = %.04f$$', tmp_beta_0 * (1 - input$freedom_V) )) })
       update_on_freedom(input, output, session, tmp_beta_0)
     } 
   })
@@ -487,7 +374,6 @@ server <- function(input, output, session) {
   output$description <- render.model.params.description(input, output, session)
   output$current_parameters <- render.model.current.parameters(input, output, session)
   output$Initial_conditions <- render.initial.conditions(input, output, session) 
-  #output$Initial_conditions_tab <- render.initial.conditions.tab(input, output, session) 
   
   observeEvent(input$plot_type ,{
     #print("PLOT_TYPE")
@@ -511,7 +397,6 @@ server <- function(input, output, session) {
         daily2 <- daily2 + ylim(min.y, max.y)
       }
       
-      #plots <- plotInput()
       ## remember that here the naming is messed up proportional<->preferential
       ggarrange(daily1, daily2,
                 plotInput_muller_proportional(), plotInput_muller_preferential(), 
@@ -532,7 +417,6 @@ server <- function(input, output, session) {
         overall2 <- overall2 + ylim(min.y, max.y)
       }
       
-      #plots <- plotInput()
       ## remember that here the naming is messed up proportional<->preferential
       ggarrange(overall1, overall2,
                 plotInput_muller_proportional(), plotInput_muller_preferential(), 
@@ -566,7 +450,6 @@ server <- function(input, output, session) {
   
   
   plotInputDownload <- reactive({
-    #plots <- plotInput()
     ggarrange(create_daily_plot(proportional_mixing = F), 
               create_muller_plot(proportional_mixing = F), 
               align = "hv", nrow = 2, ncol = 1) 
