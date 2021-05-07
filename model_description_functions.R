@@ -63,7 +63,75 @@ render.model.params.description <- function(input, output, session) {
 })
 }
 
+render.betas <- function(input,output, session, beta_0, beta, beta_V){
+  renderUI({
+    tagList(
+      helpText(sprintf('Transmissability:\n$\\beta_0$=%.04f\n\nContact rates:\n$\\beta$=%.04f\n\\$beta_V$=%.04f', beta_0, beta, beta_V)),
+      tags$script('renderMathInElement(document.getElementById("Initial_conditions"), {delimiters: [{left: "$", right: "$", display: false}]});')
+    )
+  })
+}
+render.initial.conditions <- function(input, output, session){
   
+  #xstart <- list(Sd = 0, S = 0, Id = 1, I = 0, Rd = 1, R = 0)
+  renderUI({
+      Npop <- sum(input$S + input$I + input$R + input$Sv1 + input$V)
+      xstart <- list(S  = (1 - input$sceptics) * input$S/Npop, 
+                  Sv1 = input$Sv1/Npop, Sv2 = 0,
+                  Sd = (input$sceptics) * input$S/(Npop-input$V),
+                  
+                  V  = (1 - input$sceptics) * input$V/Npop,
+                  I  = (1 - input$sceptics) * input$I/Npop, 
+                  Iv1 = 0, Iv2 = 0, 
+                  Id = (input$sceptics) * input$I/(Npop-input$V),
+                  
+                  R  = (1 - input$sceptics) * input$R/Npop, 
+                  Rv = 0,
+                  Rd = (input$sceptics) * input$R/(Npop-input$V) )
+       xstart.df <- data.frame(S  = (1 - input$sceptics) * input$S/Npop, 
+                     Sd = (input$sceptics) * input$S/(Npop-input$V),
+                     I  = (1 - input$sceptics) * input$I/Npop, 
+                     Id = (input$sceptics) * input$I/(Npop-input$V),
+                     R  = (1 - input$sceptics) * input$R/Npop, 
+                     Rd = (input$sceptics) * input$R/(Npop-input$V),
+                     V  = (1 - input$sceptics) * input$V/Npop)
+       sum1 <- sum(unlist(xstart))
+       denials <- xstart$Sd + xstart$Id + xstart$Rd
+       
+    tagList(h6("Resulting initial conditions:"),#paste0("Initial conditions:", ifelse(sum1==1 & denials==input$sceptics, "OK", paste(sum1, denials)) )),
+      # %.06f %.3g
+      helpText(style="font-size:12px;margin-top:0px;margin-bottom:2px;", sprintf('$S_D$ = %.7g', xstart$Sd)),
+      helpText(style="font-size:12px;margin-top:0px;margin-bottom:2px;", sprintf('$S_N$ =  %.7g', xstart$S)),
+      helpText(style="font-size:12px;margin-top:0px;margin-bottom:2px;", sprintf('$I_D$ = %.7g',  xstart$Id)),
+      helpText(style="font-size:12px;margin-top:0px;margin-bottom:2px;", sprintf('$I_N$ = %.7g', xstart$I)),
+      helpText(style="font-size:12px;margin-top:0px;margin-bottom:2px;",sprintf('$R_D$ = %.7g', xstart$Rd)),
+      helpText(style="font-size:12px;margin-top:0px;margin-bottom:2px;",sprintf('$R_N$ = %.7g', xstart$R)),
+      helpText(style="font-size:12px;margin-top:0px;margin-bottom:2px;",sprintf('$V$ = %.7g', xstart$V)),
+      tags$script('renderMathInElement(document.getElementById("Initial_conditions"), {delimiters: [{left: "$", right: "$", display: false}]});')
+    )
+    #withMathJax(
+    #  sprintf('$$S_D = %.04f, S_N =  %.04f, I_D = %.04f, I_N = %.04f, R_D = %.04f, R = %.04f$$', 
+    #          xstart$Sd, xstart$S,
+    #          xstart$Id, xstart$I,
+    #          xstart$Rd, xstart$R)
+    #  )
+  })
+}
+
+
+render.initial.conditions.tab <- function(input, output, session){
+  #xstart <- list(Sd = 0, S = 0, Id = 1, I = 0, Rd = 1, R = 0)
+  renderDataTable({
+    data.frame(S  = (1 - input$sceptics) * input$S/sum(input$S + input$I + input$R + input$Sv1 + input$V), 
+                            Sd = (input$sceptics) * input$S/(sum(input$S + input$I + input$R + input$Sv1 + input$V)-input$V),
+                            I  = (1 - input$sceptics) * input$I/sum(input$S + input$I + input$R + input$Sv1 + input$V), 
+                            Id = (input$sceptics) * input$I/(sum(input$S + input$I + input$R + input$Sv1 + input$V)-input$V),
+                            R  = (1 - input$sceptics) * input$R/sum(input$S + input$I + input$R + input$Sv1 + input$V), 
+                            Rd = (input$sceptics) * input$R/(sum(input$S + input$I + input$R + input$Sv1 + input$V)-input$V),
+                            V  = (1 - input$sceptics) * input$V/sum(input$S + input$I + input$R + input$Sv1 + input$V))
+  })
+}
+
 render.model.current.parameters <- function(input, output, session){
   renderUI({
   fluidRow(

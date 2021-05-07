@@ -32,8 +32,10 @@ plan(multisession)
 # Define UI for application that draws a histogram
 
 ui <- dashboardBody(
-  tabBox(width = 12,
-         tabPanel("VIP-SIRS",
+  
+         #tabsetPanel(id = "panels", type = "tabs",
+      tabBox(width = 12, id = "panels",
+         tabPanel(value = "VAP-SIRS-app", title = "VAP-SIRS",
                   #fluidPage(
                     fluidPage(
                       get_html_head() , 
@@ -42,7 +44,11 @@ ui <- dashboardBody(
                         column(6, 
                                titlePanel("VAP-SIRS: Vaccination Passes model"),
                                get_short_description()),
-                        column(6, align="center", img(src = "model.png", height = 455, width = 490))
+                        column(6, align="center", img(src = "model.png", height = 455, width = 490), 
+                               p(style="text-align: justify;", "Figure: ", strong("Graphical scheme of the VAP-SIRS model."), 
+                                  "The VAP-SIRS model extends the classical SIRS model (red arrows) 
+                                  with additional states and parameters that describe the dynamics 
+                                  of vaccination routine in a population (green arrows)."))
                       ),
                       fluidRow(
                       
@@ -83,68 +89,81 @@ ui <- dashboardBody(
                         #                     #"Infections per 1M" = "per1M"
                         #                     )))
                       ),
-                      fluidRow(
-                        mainPanel(h4("Representative signature settings: "))
-                      ),
-                      fluidRow( 
-                        column(2,
-                               checkboxInput("signatureI", "Signature I (- +)", value = F)),
-                        column(2,
-                               checkboxInput("signatureII", "Signature II (+ - +)", value = F)),
-                        column(2,
-                               checkboxInput("signatureIII", "Signature III (+)", value = F)),
-                        column(2,
-                               checkboxInput("signatureIV", "Signature IV (-)", value = F)),
-                        column(2,
-                               checkboxInput("signatureV", "Signature V (+ -)", value = F))
-                      ),
+                      
                       
                       sidebarLayout(
                         sidebarPanel(
                           fluidRow(
-                            column(6,
-                                   h5("General properties"))
+                            column(4,
+                                   h5("General properties")),
+                            column(4,
+                                   h5("Plotting Settings"))
                           ),
                           fluidRow(
-                            column(6,
-                                   checkboxInput("two_betas", withMathJax("Use VAP-SIRS setting") , value = T)),
-                            column(6,
-                                   checkboxInput("fix_nu1star", withMathJax("Fix: $\\upsilon = \\upsilon_r$") , value = T))
+                            column(4,
+                                   checkboxInput("two_betas", withMathJax("VAP-SIRS setting") , value = T),
+                                   checkboxInput("fix_nu1star", withMathJax("Fix: $\\upsilon = \\upsilon_r$") , value = T)),
+                            column(4,
+                                   checkboxInput("log_scale", "log-scale Y axis", value = F),
+                                   checkboxInput("displayTable", "Display I-values", value = F)),
+                            column(4,
+                                   checkboxInput("common_y_axis", "Common Y-axis", value = F))
+                            
                           ),
                           fluidRow(
-                            column(6,
-                                   h5("Initial values"))
+                            column(12,
+                                   sliderInput("lookup", withMathJax("$t_i$"),  
+                                               min = 1,  max = 2*365, value = 400, step=1 ))
                           ),
                           fluidRow(
-                            column(6,
-                                   sliderInput("S", withMathJax("$S = (1-d) S_N + d  S_D$"), min = 0,  max = 100000, value = S_INIT, step=1000)),
-                            column(2,
-                                   sliderInput("Sv1", withMathJax("$S_1$"), min = 0,  max = 100000, value = 0, step=1000)),
-                            column(6,
-                                   sliderInput("I", withMathJax("$I = (1-d) I_N + d  I_D$"),   min = 0, max = 20000,  value = I_INIT, step=1))
-                          ), fluidRow(
-                            column(6,
-                                   sliderInput("R", withMathJax("$R = (1-d ) R_N + d  R_D$"),  min = 0,  max = 100000, value = R_INIT, step=100 )),
-                            column(6,
-                                   sliderInput("V", withMathJax("$V$"),  min = 0,  max = 100000, value = V_INIT , step=100 ))
-                          ), fluidRow(
+                            column(8,
+                                   h5("Initial population sizes"))
+                          ),      
+                          fluidRow(
+                            column(4,
+                                   sliderInput("S", withMathJax("$S$usceptible"), min = 0,  max = 100000, value = S_INIT, step=1000),
+                                   sliderInput("R", withMathJax("$R$ecovered"),  min = 0,  max = 100000, value = R_INIT, step=100 )
+                            
+                                   ),
+                            column(4, 
+                                   sliderInput("I", withMathJax("$I$nfected"),   min = 0, max = 20000,  value = I_INIT, step=10),
+                                   sliderInput("V", withMathJax("$V$accinated"),  min = 0,  max = 100000, value = V_INIT , step=100 )
+                          
+                                   ),
+                            column(4, 
+                                   style = "background-color: #f0f0f0; border-radius: 5px; padding-left: 15px; border: 1px solid #dfdfdf;",
+                                   
+                                   uiOutput("Initial_conditions"))
+                          ),
+                         
+                          fluidRow(
                             column(12,
                                    h5("Infection parameters setup"))
                           ), fluidRow(
-                            column(4, sliderInput("infectivity",withMathJax("$\\beta_0$") , 
-                                                  min = 0,max = 1,value = BETA_0, step = 0.001)),
+                            column(4, #sliderInput("infectivity",withMathJax("$\\beta_0$") , 
+                                      #            min = 0, max = round(BETA_MAX, 3), value = BETA_0, step = 0.001), 
+                                    sliderInput("R0",withMathJax("$R_0$") , 
+                                       min = 0, max = 6, value = R_MAX, step = 0.1), 
+                                               
+                                    sliderInput("gamma", withMathJax("$\\gamma$"),  
+                                        min = 0,max = 1,value = GAMMA, step = 0.001)),
                             column(4,  sliderInput("freedom",withMathJax("$f$") , 
-                                                   min = 0,max = 1,value = F_GENERAL, step = 0.01)),
-                            column(4, sliderInput("beta11",withMathJax("$\\beta$"),
-                                                  min = 0,max = 1,value = BETA, step = 0.001))
+                                                   min = 0,max = 1,value = F_GENERAL, step = 0.01), 
+                                       sliderInput("freedom_V",withMathJax("$f_V$") , 
+                                               min = 0,max = 1,value = F_V, step = 0.01)),
+                            column(4, 
+                                   style = "background-color: #f0f0f0; border-radius: 5px; padding-left: 15px; border: 1px solid #dfdfdf;",
+                                   h6("Transmissability:"),
+                                   uiOutput("beta_0_val"), 
+                                   h6("Contact rates:"),
+                                   uiOutput("beta_val"),
+                                   uiOutput("beta_V_val"))
+                                   #sliderInput("beta11",withMathJax("$\\beta$"),
+                                   #                min = 0,max = 1,value = BETA, step = 0.001), 
+                                  #    sliderInput("beta22",withMathJax("$\\beta_V$"), 
+                                   #            min = 0,max = 1,value = BETA, step = 0.001))
                           ), 
                           fluidRow(
-                            column(4, sliderInput("gamma", withMathJax("$\\gamma$"),  
-                                                  min = 0,max = 1,value = GAMMA, step = 0.001)),
-                            column(4, sliderInput("freedom_V",withMathJax("$f_V$") , 
-                                                  min = 0,max = 1,value = F_V, step = 0.01)),
-                            column(4, sliderInput("beta22",withMathJax("$\\beta_V$"), 
-                                                  min = 0,max = 1,value = BETA, step = 0.001))
                           ), fluidRow(
                             column(12,
                                    h5("Vaccination parameters setup"))
@@ -168,18 +187,43 @@ ui <- dashboardBody(
                           )
                           ),
                         mainPanel(
-                          fluidRow(
-                            column(6,
-                                   h5("Plotting Settings"))
+                          fluidRow( style = "background-color: #f4f4f4; border-radius: 5px; padding-left: 15px; border: 1px solid #dfdfdf;",
+                            h5("    Representative signature settings: "),
+                          
+                            column(2,
+                                   checkboxInput("signatureI", HTML("Sig. I: [&#8722;, &#43;]"), value = F)),
+                            column(2,
+                                   checkboxInput("signatureII", HTML("Sig. II: [&#43;, &#8722;, &#43;]"), value = F)),
+                            column(2,
+                                   checkboxInput("signatureIII", HTML("Sig. III: [&#43;]"), value = F)),
+                            column(2,
+                                   checkboxInput("signatureIV", HTML("Sig. IV: [&#8722;]"), value = F)),
+                            column(2,
+                                   checkboxInput("signatureV", HTML("Sig. V: [&#43;, &#8722;]"), value = F)),
+                            fluidRow(
+                              column(4,
+                                     sliderInput("sim_tmax", withMathJax("$t_{max}$ - simulation time"),  
+                                                 min = 1,  max = 4*365, value = T_MAX_INIT, step=1 )),
+                              column(4,
+                                     selectInput("plot_type", "Select plot type:",
+                                                 c("Daily incidence" = "daily",
+                                                   "Infections per 1M" = "per1M"
+                                                 ))),
+                              column(4, 
+                                     h5("Download"),
+                                     downloadButton("downloadPlot", "plot"),
+                                     downloadButton("downloadData", ".csv data"))
+                              
+                              
+                            ),
+                            
                           ),
+                          #hr(),
+                          #fluidRow(
+                          #  column(6,
+                          #         h5("Plotting Settings"))
+                          #),
                           fluidRow(
-                            column(3,
-                                   checkboxInput("log_scale", "Use log-scale on Y axis", value = F)),
-                            column(3,
-                                   checkboxInput("displayTable", "Display table values", value = F)),
-                            column(3,
-                                   sliderInput("lookup", withMathJax("$t_i$"),  
-                                               min = 1,  max = 2*365, value = 400, step=1 ))
                           ),
                           fluidRow(
                             column(6,
@@ -191,44 +235,34 @@ ui <- dashboardBody(
                             plotOutput("extDistPlotv2", height = "600px")
                           ),
                           fluidRow(
-                            column(3, 
-                                   downloadButton("downloadPlot", "Download plot")),
-                            column(3, 
-                                   downloadButton("downloadData", "Download .csv")),
-                            column(3,
-                                   selectInput("plot_type", "Select plot type:",
-                                               c("Daily incidence" = "daily"#,
-                                                 #"Infections per 1M" = "per1M"
-                                               )))
+                           
                           )
                         ) # mainPanel
                       ), #SidebarLayout
                         
-                      # fluidRow(
-                      #   column(6,
-                      #        h4("Initial values"))
-                      # ),
-                      # fluidRow(
-                      #   column(2,
-                      #          sliderInput("S", withMathJax("$S = (1-d) \\cdot S_N + d \\cdot S_D$"), min = 0,  max = 100000, value = S_INIT, step=1000)),
-                      #   column(2,
-                      #          sliderInput("Sv1", withMathJax("$S_1$"), min = 0,  max = 100000, value = 0, step=1000)),
-                      #   column(2,
-                      #          sliderInput("I", withMathJax("$I = (1-d) \\cdot I_N + d \\cdot I_D$"),   min = 0, max = 20000,  value = I_INIT, step=1)),
-                      #   column(2,
-                      #          sliderInput("R", withMathJax("$R = (1-d ) \\cdot R_N + d \\cdot R_D$"),  min = 0,  max = 100000, value = R_INIT, step=100 )),
-                      #   column(2,
-                      #          sliderInput("V", withMathJax("$V$"),  min = 0,  max = 100000, value = V_INIT , step=100 ))
-                      # ),
+                     
+                       
                       fluidRow(
                       #  column(6,
                       #         h4("Parameter setup"))
                       ),       
                       
-                      fluidRow(
+                      fluidRow(id = "old_params",
+                               fluidRow(
+                                 #   column(2,
+                                 #          sliderInput("S", withMathJax("$S = (1-d) \\cdot S_N + d \\cdot S_D$"), min = 0,  max = 100000, value = S_INIT, step=1000)),
+                                 column(2,
+                                        sliderInput("Sv1", withMathJax("$S_1$"), min = 0,  max = 100000, value = 0, step=1000)),
+                                 #   column(2,
+                                 #          sliderInput("I", withMathJax("$I = (1-d) \\cdot I_N + d \\cdot I_D$"),   min = 0, max = 20000,  value = I_INIT, step=1)),
+                                 #   column(2,
+                                 #          sliderInput("R", withMathJax("$R = (1-d ) \\cdot R_N + d \\cdot R_D$"),  min = 0,  max = 100000, value = R_INIT, step=100 )),
+                                 #   column(2,
+                                 #          sliderInput("V", withMathJax("$V$"),  min = 0,  max = 100000, value = V_INIT , step=100 ))
+                               ),
                         column(2,
-                        #       sliderInput("infectivity",withMathJax("$\\beta_0$") , min = 0,max = 1,value = BETA_0, step = 0.001),
-                        #       #sliderInput("beta11",label = withMathJax("$\\beta_{S_N,I_N}^{I_N}$"), min = 0,max = 1,value = BETA, step = 0.001)
+                               sliderInput("infectivity",withMathJax("$\\beta_0$") , min = 0,max = 1,value = BETA_0, step = 0.001),
+                               sliderInput("beta11",label = withMathJax("$\\beta_{S_N,I_N}^{I_N}$"), min = 0,max = 1,value = BETA, step = 0.001),
                         #       sliderInput("beta11",withMathJax("$\\beta$"), min = 0,max = 1,value = BETA, step = 0.001),
                                sliderInput("beta12",withMathJax("$\\beta_{S_N,I_N}^{I_V}$") , min = 0,max = 1,value = BETA, step = 0.001),
                                sliderInput("beta13",withMathJax("$\\beta_{S_N,I_N}^{I_D}$") , min = 0,max = 1,value = BETA, step = 0.001)
@@ -238,7 +272,7 @@ ui <- dashboardBody(
                                #sliderInput("freedom",withMathJax("$f$") , min = 0,max = 1,value = F_GENERAL, step = 0.01),
                                sliderInput("beta21",withMathJax("$\\beta_{S_V,I_V}^{I_N}$"), min = 0,max = 1,value = BETA, step = 0.001),
                                #sliderInput("beta22",withMathJax("$\\beta_V$"), min = 0,max = 1,value = BETA, step = 0.001),
-                               #sliderInput("beta22",withMathJax("$\\beta_{S_V,I_V}^{I_V}$"), min = 0,max = 1,value = BETA_V, step = 0.001),
+                               sliderInput("beta22",withMathJax("$\\beta_{S_V,I_V}^{I_V}$"), min = 0,max = 1,value = BETA_V, step = 0.001),
                                sliderInput("beta23",withMathJax("$\\beta_{S_V,I_V}^{I_D}$"), min = 0,max = 1,value = BETA, step = 0.001)
                                
                                ),
@@ -277,7 +311,7 @@ ui <- dashboardBody(
                     #)
                   ),
                   
-         tabPanel("VIP-SIRS: Description",
+         tabPanel(value = "VAP-SIRS-formulation", title = "VAP-SIRS: formulation",
                   fluidPage(
                     get_html_head()
                     , shinyjs::useShinyjs(),
@@ -293,15 +327,20 @@ ui <- dashboardBody(
                     ),
                     uiOutput("description")
                     )
+         
+         ),
+         hr(),
+         h6("VAP-SIRS shiny app was developed in R and Rstudio by K.Gogolewski; Copyright", 
+            HTML("&#169;"), "2021", align = "center")
          )
-         )
+     # )
     )
 
 
-update_on_freedom <- function(input, output, session){
-  updateSliderInput(session, "beta11", value =  (1 - input$freedom) * input$infectivity ) 
-  updateSliderInput(session, "beta22", value =   (1 - input$freedom_V) * input$infectivity ) #* input$reduction 
-  update_betas(beta_val = (1 - input$freedom) * input$infectivity, session)
+update_on_freedom <- function(input, output, session, beta0){
+  updateSliderInput(session, "beta11", value =  (1 - input$freedom) * beta0 ) 
+  updateSliderInput(session, "beta22", value =   (1 - input$freedom_V) * beta0 ) #* input$reduction 
+  update_betas(beta_val = (1 - input$freedom) * beta0, session)
 }
 
 update_betas <- function(beta_val, session){
@@ -320,14 +359,32 @@ signatures_f <- lapply(1:5, function(i)
   function(input, output, session){ 
     updateSliderInput(session, "freedom", value = signatures_df[i,"f"]); 
     updateSliderInput(session, "freedom_V", value = signatures_df[i,"fv"]);
-    update_on_freedom(input, output, session);
+    updateSliderInput(session, "R0", value = R_MAX); 
+    updateSliderInput(session, "gamma", value = GAMMA); 
+    updateSliderInput(session, "S", value = S_INIT); 
+    updateSliderInput(session, "I", value = I_INIT); 
+    updateSliderInput(session, "R", value = R_INIT); 
+    updateSliderInput(session, "V", value = V_INIT); 
+    updateSliderInput(session, "nu1", value = 1/UPSILON); 
+    updateSliderInput(session, "nu1_star", value = 1/UPSILON_R); 
+    updateSliderInput(session, "nu2", value = 1/OMEGA); 
+    updateSliderInput(session, "kappa", value = 1/KAPPA); 
+    updateSliderInput(session, "sceptics", value = D_FRACTION); 
+    updateSliderInput(session, "alpha1", value = A_1); 
+    update_on_freedom(input, output, session, beta0 = BETA_MAX);
 })
 
 names(signatures_f) <- paste("signature", as.roman(1:5), sep = "")
 
 
+
+
 # Define server logic required to draw a histogram
 server <- function(input, output, session) {
+  
+  observeEvent(input$link_to_tabpanel_a, {
+    updateTabsetPanel(session, "panels", selected = "VAP-SIRS-formulation")
+  })
   
   #output$beta11_slider <- renderUI({
     #if(!input$two_betas){
@@ -351,24 +408,26 @@ server <- function(input, output, session) {
     #  updateSliderInput(session, "beta11", label = withMathJax("$\\beta_{S_N,I_N}^{I_V}$"))
     #  updateSliderInput(session, "beta22", label = withMathJax("$\\beta_{S_V,I_V}^{I_V}$"))    
     #}
-    shinyjs::toggle(id="beta12", ! input$two_betas) 
-    shinyjs::toggle(id="beta13", ! input$two_betas) 
-    shinyjs::toggle(id="beta21", ! input$two_betas) 
-    shinyjs::toggle(id="beta23", ! input$two_betas) 
-    shinyjs::toggle(id="beta31", ! input$two_betas) 
-    shinyjs::toggle(id="beta32", ! input$two_betas) 
-    shinyjs::toggle(id="beta33", ! input$two_betas) 
-    shinyjs::toggle(id="alpha2", ! input$two_betas) 
-    shinyjs::toggle(id="Sv1", ! input$two_betas) 
-    toggleState(id="beta12") 
-    toggleState(id="beta13")
-    toggleState(id="beta21")
-    toggleState(id="beta23")
-    toggleState(id="beta31")
-    toggleState(id="beta32")
-    toggleState(id="beta33")
-    toggleState(id="alpha2")
-    toggleState(id="Sv1")
+    #shinyjs::toggle(id="beta12", ! input$two_betas) 
+    #shinyjs::toggle(id="beta13", ! input$two_betas) 
+    #shinyjs::toggle(id="beta21", ! input$two_betas) 
+    #shinyjs::toggle(id="beta23", ! input$two_betas) 
+    #shinyjs::toggle(id="beta31", ! input$two_betas) 
+    #shinyjs::toggle(id="beta32", ! input$two_betas) 
+    #shinyjs::toggle(id="beta33", ! input$two_betas) 
+    #shinyjs::toggle(id="alpha2", ! input$two_betas) 
+    #shinyjs::toggle(id="Sv1", ! input$two_betas) 
+    shinyjs::toggle(id="old_params", ! input$two_betas) 
+    #toggleState(id="beta12") 
+    #toggleState(id="beta13")
+    #toggleState(id="beta21")
+    #toggleState(id="beta23")
+    #toggleState(id="beta31")
+    #toggleState(id="beta32")
+    #toggleState(id="beta33")
+    #toggleState(id="alpha2")
+    #toggleState(id="Sv1")
+    toggleState(id="old_params")
   })
 
   observeEvent(input$fix_nu1star, {toggleState(id="nu1star", !input$fix_nu1star)})
@@ -382,22 +441,54 @@ server <- function(input, output, session) {
     } 
   })
   
-  observeEvent(input$freedom | input$freedom_V | input$infectivity , { #} | input$reduction ,{
+  observeEvent(input$freedom | input$freedom_V | input$R0 | input$gamma , { #} | input$reduction ,{
     #print("OBSERVED CHANGE")
-    if (input$two_betas) { 
-      update_on_freedom(input, output, session)
+    if (input$two_betas) { print("Describe BETAS");
+      tmp_beta_0 <- input$R0 * input$gamma
+      tmp_beta <- tmp_beta_0 * (1 - input$freedom)
+      tmp_beta_V <- tmp_beta_0 * (1 - input$freedom_V) 
+      #tagList(
+      #  helpText(printf('Transmissability:\n$\\beta_0=%.04f$\n\nContact rates:\n\\beta=%.04f$\n\\beta_V=%.04f$', beta_0, beta, beta_V)),
+      #  tags$script('renderMathInElement(document.getElementById("Initial_conditions"), {delimiters: [{left: "$", right: "$", display: false}]});')
+      #)
+      #output$beta_0_val <- render.betas(input, output, session, tmp_beta_0, tmp_beta, tmp_beta_V)
+      output$beta_0_val <- renderUI({ 
+        tagList( 
+          helpText(style="font-size:10px;margin-top:0px;margin-bottom:1px;", sprintf('$\\beta_0 = R_0 \\cdot \\gamma$')),
+          helpText(style="margin-top:0px;margin-bottom:2px;", sprintf('$\\beta_0$ = %.04f', tmp_beta_0)),
+          tags$script('renderMathInElement(document.getElementById("beta_0_val"), {delimiters: [{left: "$", right: "$", display: false}]});')
+        )
+      })
+      output$beta_val<- renderUI({ 
+        tagList( 
+          helpText(style="font-size:10px;margin-top:0px;margin-bottom:1px;", sprintf('$\\beta = \\beta_0 \\cdot (1-f)$')),
+          helpText(style="margin-top:0px;margin-bottom:2px;", sprintf('$\\beta$ = %.04f', tmp_beta)),
+          tags$script('renderMathInElement(document.getElementById("beta_val"), {delimiters: [{left: "$", right: "$", display: false}]});')
+        )
+      })
+      output$beta_V_val<- renderUI({ 
+        tagList( 
+          helpText(style="font-size:10px;margin-top:0px;margin-bottom:1px;", sprintf('$\\beta_V = \\beta_0 \\cdot (1-f_V)$')),
+          helpText(style="margin-top:0px;margin-bottom:2px;", sprintf('$\\beta_V$ = %.04f', tmp_beta_V)),
+          tags$script('renderMathInElement(document.getElementById("beta_V_val"), {delimiters: [{left: "$", right: "$", display: false}]});')
+        )
+      })
+      #output$beta_val <- renderUI({ withMathJax( sprintf('$$\\beta = %.04f$$', tmp_beta_0 * (1 - input$freedom) )) })
+      #output$beta_V_val <- renderUI({ withMathJax( sprintf('$$\\beta_V = %.04f$$', tmp_beta_0 * (1 - input$freedom_V) )) })
+      update_on_freedom(input, output, session, tmp_beta_0)
     } 
   })
+  
   observeEvent(input$displayTable, { 
     toggle(id="lookup", input$displayTable)
   })
-  
 
   output$ode_model_description <- render.model.ode.description(input, output, session)
   output$description <- render.model.params.description(input, output, session)
   output$current_parameters <- render.model.current.parameters(input, output, session)
+  output$Initial_conditions <- render.initial.conditions(input, output, session) 
+  #output$Initial_conditions_tab <- render.initial.conditions.tab(input, output, session) 
   
-
   observeEvent(input$plot_type ,{
     #print("PLOT_TYPE")
     if (input$plot_type == "daily") { 
@@ -409,9 +500,20 @@ server <- function(input, output, session) {
   
   showDailyIncidents <- function(){
     renderPlot({
+      daily1 <- plotInput_daily_proportional()
+      daily2 <- plotInput_daily_preferential()
+      if(input$common_y_axis & ! input$log_scale){
+        y1.range <- ggplot_build(daily1)$layout$panel_scales_y[[1]]$range$range
+        y2.range <- ggplot_build(daily2)$layout$panel_scales_y[[1]]$range$range
+        max.y <- max(c(y1.range, y2.range))
+        min.y <- min(c(y1.range, y2.range))
+        daily1 <- daily1 + ylim(min.y, max.y)
+        daily2 <- daily2 + ylim(min.y, max.y)
+      }
+      
       #plots <- plotInput()
       ## remember that here the naming is messed up proportional<->preferential
-      ggarrange(plotInput_daily_proportional(), plotInput_daily_preferential(),
+      ggarrange(daily1, daily2,
                 plotInput_muller_proportional(), plotInput_muller_preferential(), 
                 align = "hv", nrow = 2, ncol = 2) 
     })
@@ -419,12 +521,32 @@ server <- function(input, output, session) {
   
   showPer1MCases <- function(){ 
     renderPlot({
-      plots <- plotInput()
+      overall1 <- plotInput_overall_proportional()
+      overall2 <- plotInput_overall_preferential()
+      if(input$common_y_axis & ! input$log_scale){
+        y1.range <- ggplot_build(overall1)$layout$panel_scales_y[[1]]$range$range
+        y2.range <- ggplot_build(overall2)$layout$panel_scales_y[[1]]$range$range
+        max.y <- max(c(y1.range, y2.range))
+        min.y <- min(c(y1.range, y2.range))
+        overall1 <- overall1 + ylim(min.y, max.y)
+        overall2 <- overall2 + ylim(min.y, max.y)
+      }
       
-      ggarrange(plots[["g.cum"]], plots[["g.cum"]],
-                plotInput_muller_proportional(), plotInput_muller_preferential(), nrow = 2, ncol = 2) 
+      #plots <- plotInput()
+      ## remember that here the naming is messed up proportional<->preferential
+      ggarrange(overall1, overall2,
+                plotInput_muller_proportional(), plotInput_muller_preferential(), 
+                align = "hv", nrow = 2, ncol = 2) 
     })
   }
+  
+  plotInput_overall_proportional <-   reactive({
+    create_overall_plot(proportional_mixing = F)
+  })
+  
+  plotInput_overall_preferential <-   reactive({
+    create_overall_plot(proportional_mixing = T)
+  })
   
   plotInput_daily_proportional <-   reactive({
     create_daily_plot(proportional_mixing = F)
@@ -452,18 +574,20 @@ server <- function(input, output, session) {
   
   
   create_daily_plot <- function(proportional_mixing = F){
-    times <- seq(from=0,to=2*365,by=1)
+    times <- seq(from=0,to=input$sim_tmax,by=1)
     Npop <- sum(input$S + input$I + input$R + input$Sv1 + input$V)
     xstart <- c(S  = (1 - input$sceptics) * input$S/Npop, 
                 Sv1 = input$Sv1/Npop, Sv2 = 0,
-                Sd = (input$sceptics) * input$S/Npop,
-                V  = input$V/Npop,
+                Sd = (input$sceptics) * input$S/(Npop-input$V),
+                
+                V  = (1 - input$sceptics) * input$V/Npop,
                 I  = (1 - input$sceptics) * input$I/Npop, 
                 Iv1 = 0, Iv2 = 0, 
-                Id = (input$sceptics) * input$I/Npop,
+                Id = (input$sceptics) * input$I/(Npop-input$V),
+                
                 R  = (1 - input$sceptics) * input$R/Npop, 
                 Rv = 0,
-                Rd = (input$sceptics) * input$R/Npop )
+                Rd = (input$sceptics) * input$R/(Npop-input$V) )
     
     parms1 <- c(beta11=input$beta11,beta12=input$beta12,beta13=input$beta13,
                 beta21=input$beta21,beta22=input$beta22,beta23=input$beta23,
@@ -489,17 +613,22 @@ server <- function(input, output, session) {
                      I = rowSums(out[, c("I", "Id")]), 
                      Isum = rowSums(out[, c("I", "Iv1", "Iv2", "Id")]))
     
-    
+    print(head(tmp.dat))
     dat.diff <- rbind(
       cbind(time = out[-1, c("time")], 
             alpha = input$alpha1, 
-            data.frame(diff(as.matrix(
+            #data.frame(diff(as.matrix(
+            #  tmp.dat 
+            #))) + (1/6) * tmp.dat[-1,]
+            ( data.frame(diff(as.matrix(
               tmp.dat 
-            ))) + (1/6) * tmp.dat[-1,] 
+            ))) - ( exp(-input$gamma) - 1) * tmp.dat[-nrow(tmp.dat),] ) * input$gamma / (1 - exp(-input$gamma))
       )) %>%
       gather(variable,value,-c(time,alpha) )
     
-    
+    print( ( ( data.frame(diff(as.matrix(
+      tmp.dat 
+    ))) - ( exp(-input$gamma) - 1) * tmp.dat[-nrow(tmp.dat),] ) * input$gamma / (1 - exp(-input$gamma)) )[580:585,])
     dat.diff$alpha <- factor(dat.diff$alpha)
     my.labels <- paste0(as.double(levels(dat.diff$alpha)) * 100, "%")
     levels(dat.diff$alpha) <- my.labels
@@ -543,7 +672,7 @@ server <- function(input, output, session) {
     
     g.diff <- g.diff +
       scale_color_manual("Group:",
-                         labels = expression("All",I,   I[1], I[2]),
+                         labels = expression(I[Sigma]^{"*"}, I^{"*"},   I[1]^{"*"}, I[2]^{"*"}),
                          values = c("#ff3747","#dee500",  "#ff458f", "#5e3c99",  "darkblue") ) + 
       geom_line(size = 1, alpha = 0.8, linetype = "dashed") +
       geom_line(size = 1, 
@@ -584,20 +713,164 @@ server <- function(input, output, session) {
     g.diff
   }
   
-
-  create_muller_plot <- function(proportional_mixing = F){
-    times <- seq(from=0,to=2*365,by=1)
+  
+  create_overall_plot <- function(proportional_mixing = F){
+    times <- seq(from=0,to=input$sim_tmax,by=1)
     Npop <- sum(input$S + input$I + input$R + input$Sv1 + input$V)
     xstart <- c(S  = (1 - input$sceptics) * input$S/Npop, 
                 Sv1 = input$Sv1/Npop, Sv2 = 0,
-                Sd = (input$sceptics) * input$S/Npop,
-                V  = input$V/Npop,
+                Sd = (input$sceptics) * input$S/(Npop-input$V),
+                
+                V  = (1 - input$sceptics) * input$V/Npop,
                 I  = (1 - input$sceptics) * input$I/Npop, 
                 Iv1 = 0, Iv2 = 0, 
-                Id = (input$sceptics) * input$I/Npop,
+                Id = (input$sceptics) * input$I/(Npop-input$V),
+                
                 R  = (1 - input$sceptics) * input$R/Npop, 
                 Rv = 0,
-                Rd = (input$sceptics) * input$R/Npop )
+                Rd = (input$sceptics) * input$R/(Npop-input$V) )
+    
+    parms1 <- c(beta11=input$beta11,beta12=input$beta12,beta13=input$beta13,
+                beta21=input$beta21,beta22=input$beta22,beta23=input$beta23,
+                beta31=input$beta31,beta32=input$beta32,beta33=input$beta33,
+                gamma_1=input$gamma, gamma_2=input$gamma,
+                nu_1=input$nu1,nu_2=input$nu2,nu_1star=input$nu1star,
+                kappa=input$kappa,a=input$sceptics, proportional_mixing = F,
+                alpha=input$alpha1)
+    
+    if(proportional_mixing){
+      parms1["proportional_mixing"] <- T
+    }
+    
+    ode(
+      func=ext.closed.sir.model.v2,
+      y=xstart,
+      times=times,
+      parms=parms1
+    ) %>%
+      as.data.frame() -> out
+    
+    tmp.dat <- cbind(out[, c("Iv1", "Iv2")], 
+                     I = rowSums(out[, c("I", "Id")]), 
+                     Isum = rowSums(out[, c("I", "Iv1", "Iv2", "Id")]))
+    
+    dat.diff <- rbind(
+      cbind(out[, c("time", "Iv1", "Iv2")], 
+            I = rowSums(out[, c("I", "Id")]), 
+            Isum = rowSums(out[, c("I", "Iv1", "Iv2", "Id")]), alpha = input$alpha1)) %>%
+      gather(variable,value,-c(time,alpha) ) 
+    
+    #dat.diff <- rbind(
+    #  cbind(time = out[-1, c("time")], 
+    #        alpha = input$alpha1, 
+    #        data.frame(diff(as.matrix(
+    #          tmp.dat 
+    #        ))) + (1/6) * tmp.dat[-1,] 
+    #  )) %>%
+    #  gather(variable,value,-c(time,alpha) )
+    
+    
+    dat.diff$alpha <- factor(dat.diff$alpha)
+    my.labels <- paste0(as.double(levels(dat.diff$alpha)) * 100, "%")
+    levels(dat.diff$alpha) <- my.labels
+    print(levels(dat.diff$variable))
+    print(levels(factor(dat.diff$variable)))
+    dat.diff$variable <- factor(dat.diff$variable, levels = c( "Isum", "I", "Iv1", "Iv2"))
+    #dat.diff$variable <- (dat.diff$variable, levels = c("I", "Isum", "Iv1", "Iv2"))
+    print(levels(factor(dat.diff$variable)))
+    
+    if( input$displayTable ) {
+      my.label.coords <- get.coords.for.label(input$lookup, 
+                                              xmin = min(dat.diff$time), xmax = max(dat.diff$time),
+                                              ymin = 0, ymax = max(dat.diff$value) * 1e6)
+      
+      for.table <- dat.diff[dat.diff$time==input$lookup, ]
+      print(for.table)
+      mytable <- cbind(Group=c("All", "I", "I1", "I2"),
+                       data.frame(Value=c(round(for.table[for.table$variable == "Isum",]$value * 1e6), 
+                                          round(for.table[for.table$variable == "I",]$value * 1e6), 
+                                          round(for.table[for.table$variable == "Iv1",]$value * 1e6), 
+                                          round(for.table[for.table$variable == "Iv2",]$value * 1e6))))
+      
+      print(mytable)
+    }
+    
+    # DAILY PROPORTIONAL 
+    if(length(levels(dat.diff$alpha)) > 1){
+      g.diff <- dat.diff  %>% 
+        ggplot(aes(x=time, y=value * 1e6, 
+                   color=variable, 
+                   group = interaction(alpha, variable), 
+                   linetype = alpha)) +
+        scale_linetype_manual("Efficacy: ", values = c("solid", "dotted")) 
+    } else {
+      g.diff <- dat.diff  %>% 
+        ggplot(aes(x=time, 
+                   y=value * 1e6, 
+                   color=variable, 
+                   group = interaction(alpha, variable))) 
+    }
+    
+    g.diff <- g.diff +
+      scale_color_manual("Group:",
+                         labels = expression(I[Sigma]^{"*"}, I^{"*"},   I[1]^{"*"}, I[2]^{"*"}),
+                         values = c("#ff3747","#dee500",  "#ff458f", "#5e3c99",  "darkblue") ) + 
+      geom_line(size = 1, alpha = 0.8, linetype = "dashed") +
+      geom_line(size = 1, 
+                data = subset(dat.diff, variable == "Isum"), 
+                linetype = "solid", 
+                color = "#ff3747") +
+      theme_minimal() +
+      
+      guides(color = guide_legend(ncol = 1, override.aes = list(size = 2, linetype = "solid"))) + 
+      theme(text = element_text(size=18), 
+            legend.text = element_text(size=18),
+            legend.key.width = unit(1,"cm"), 
+            legend.position = "right", 
+            legend.box = "vertical") + 
+      labs(x = 'Time (days)', 
+           y = "Infected in 1M pop."
+      )
+    if(input$log_scale){
+      g.diff <- g.diff + 
+        scale_y_log10( breaks = trans_breaks("log10", function(x) 10^x),
+                       labels = trans_format("log10", math_format(10^.x)), 
+                       limits = c(10^-10, 10^5)) + 
+        annotation_logticks(sides="l") +
+        labs( y = "Infected in 1M pop. [log]")
+    } 
+    if(input$displayTable) {
+      g.diff <- g.diff + geom_vline(xintercept = input$lookup) + 
+        annotation_custom(tableGrob(mytable, rows = NULL, 
+                                    theme = ttheme_default(
+                                      core=list(bg_params = list(fill = "lightgrey", col=NA, alpha = 0.8),
+                                                fg_params=list(fontface=3)))), 
+                          xmin = my.label.coords$xmin, 
+                          xmax = my.label.coords$xmax,
+                          ymax = my.label.coords$ymax, 
+                          ymin = my.label.coords$ymin) 
+    }
+    
+    g.diff
+  }
+  
+  
+
+  create_muller_plot <- function(proportional_mixing = F){
+    times <- seq(from=0,to=input$sim_tmax,by=1)
+    Npop <- sum(input$S + input$I + input$R + input$Sv1 + input$V)
+    xstart <- c(S  = (1 - input$sceptics) * input$S/Npop, 
+                Sv1 = input$Sv1/Npop, Sv2 = 0,
+                Sd = (input$sceptics) * input$S/(Npop-input$V),
+                
+                V  = (1 - input$sceptics) * input$V/Npop,
+                I  = (1 - input$sceptics) * input$I/Npop, 
+                Iv1 = 0, Iv2 = 0, 
+                Id = (input$sceptics) * input$I/(Npop-input$V),
+                
+                R  = (1 - input$sceptics) * input$R/Npop, 
+                Rv = 0,
+                Rd = (input$sceptics) * input$R/(Npop-input$V) )
     
     parms1 <- c(beta11=input$beta11,beta12=input$beta12,beta13=input$beta13,
                 beta21=input$beta21,beta22=input$beta22,beta23=input$beta23,
@@ -659,19 +932,20 @@ server <- function(input, output, session) {
   
   plotInput <- reactive({
     
-    times <- seq(from=0,to=2*365,by=1)
+    times <- seq(from=0,to=input$sim_tmax,by=1)
     Npop <- sum(input$S + input$I + input$R + input$Sv1 + input$V)
     xstart <- c(S  = (1 - input$sceptics) * input$S/Npop, 
-                Sv1 = input$Sv1/Npop, 
-                Sv2 = 0,
-                Sd = (input$sceptics) * input$S/Npop,
-                V  = input$V/Npop,
+                Sv1 = input$Sv1/Npop, Sv2 = 0,
+                Sd = (input$sceptics) * input$S/(Npop-input$V),
+                
+                V  = (1 - input$sceptics) * input$V/Npop,
                 I  = (1 - input$sceptics) * input$I/Npop, 
                 Iv1 = 0, Iv2 = 0, 
-                Id = (input$sceptics) * input$I/Npop,
+                Id = (input$sceptics) * input$I/(Npop-input$V),
+                
                 R  = (1 - input$sceptics) * input$R/Npop, 
                 Rv = 0,
-                Rd = (input$sceptics) * input$R/Npop )
+                Rd = (input$sceptics) * input$R/(Npop-input$V) )
     
  
 
@@ -1070,19 +1344,21 @@ server <- function(input, output, session) {
   
   datasetInput <- reactive({
     # generate bins based on input$bins from ui.R
+    Npop <- sum(c(input$S, input$I, input$R, input$V))
+    times <- seq(from=0,to=input$sim_tmax,by=1)
     
-    times <- seq(from=0,to=2*365,by=1)
-    
-    xstart <- c(S  = (1 - input$sceptics) * input$S/sum(input$S + input$I + input$R), 
-                Sv1 = 0, Sv2 = 0,
-                Sd = (input$sceptics) * input$S/sum(input$S + input$I + input$R),
-                V  = 0,
-                I  = (1 - input$sceptics) * input$I/sum(input$S + input$I + input$R), 
+    xstart <- c(S  = (1 - input$sceptics) * input$S/Npop, 
+                Sv1 = input$Sv1/Npop, Sv2 = 0,
+                Sd = (input$sceptics) * input$S/(Npop-input$V),
+                
+                V  = (1 - input$sceptics) * input$V/Npop,
+                I  = (1 - input$sceptics) * input$I/Npop, 
                 Iv1 = 0, Iv2 = 0, 
-                Id = (input$sceptics) * input$I/sum(input$S + input$I + input$R),
-                R  = (1 - input$sceptics) * input$R/sum(input$S + input$I + input$R), 
+                Id = (input$sceptics) * input$I/(Npop-input$V),
+                
+                R  = (1 - input$sceptics) * input$R/Npop, 
                 Rv = 0,
-                Rd = (input$sceptics) * input$R/sum(input$S + input$I + input$R) )
+                Rd = (input$sceptics) * input$R/(Npop-input$V) )
     
     parms1 <- c(beta11=input$beta11,beta12=input$beta12,beta13=input$beta13,
                 beta21=input$beta21,beta22=input$beta22,beta23=input$beta23,
