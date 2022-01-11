@@ -1,7 +1,7 @@
 # VAP-SIRS
 A SEIR-based model for prediction of COVID-19 spread dynamics after vaccination passport implementation. The model is part of an article:
 
-## Assessing the risk of COVID-19 epidemic resurgence in relation to the Delta variant and to vaccination passes
+## Risk assessment of COVID-19 epidemic resurgence in relation to the Delta variant and vaccination passes
 by
 _Tyll Krueger,  Krzysztof Gogolewski,  Marcin Bodych,  Anna Gambin,  Giulia Giordano,  Sarah Cuschieri,  Thomas Czypionka,  Matjaz Perc,  Elena Petelos,  VMagdalena Rosińska and Ewa Szczurek_
 
