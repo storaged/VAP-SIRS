@@ -1,3 +1,5 @@
+# file contains only helper html headers/styles for the frontend off the app.
+
 get_html_head <- function() {
   tags$head(
   tags$link(rel="stylesheet", 
